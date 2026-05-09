@@ -1,0 +1,31 @@
+name: daily-weather                                                                                                                                                                                                        
+                                                                                                                                                                                                                             
+  on:             
+    schedule:
+      - cron: '0 1 * * *'
+    workflow_dispatch:                                                                                                                                                                                                       
+      inputs:
+        city:                                                                                                                                                                                                                
+          description: 'City override (leave empty for default)'
+          required: false
+          default: ''                                                                                                                                                                                                        
+                                                                                                                                                                                                                             
+  jobs:                                                                                                                                                                                                                      
+    notify:                                                                                                                                                                                                                  
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+
+        - uses: actions/setup-python@v5                                                                                                                                                                                      
+          with:
+            python-version: '3.12'                                                                                                                                                                                           
+                  
+        - name: Install deps
+          run: pip install requests
+                                                                                                                                                                                                                             
+        - name: Send weather
+          env:                                                                                                                                                                                                               
+            CAIYUN_TOKEN: ${{ secrets.CAIYUN_TOKEN }}
+            SERVER_CHAN_KEY: ${{ secrets.SERVER_CHAN_KEY }}
+            CITY_OVERRIDE: ${{ github.event.inputs.city }}                                                                                                                                                                   
+          run: python weather_notify.py
